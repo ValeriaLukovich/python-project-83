@@ -2,8 +2,11 @@
 name = "hexlet-code"
 version = "0.1.0"
 description = ""
-authors = ["Valeria"]
+authors = ["Valeria Lukovich <valeria_lukovic@mail.ru>"]
 readme = "README.md"
+packages = [
+    { include = "page_analyze" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.8.18"

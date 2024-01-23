@@ -16,7 +16,7 @@ python = "^3.8.18"
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"
 pytest = "7.4.4"
-gunicorn = "^21.0.0"
+gunicorn = "21.2.0"
 
 [build-system]
 requires = ["poetry-core"]

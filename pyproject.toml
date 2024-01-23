@@ -17,6 +17,7 @@ python = "^3.8.18"
 flake8 = "^7.0.0"
 pytest = "7.4.4"
 gunicorn = "21.2.0"
+flask = "3.0.1"
 
 [build-system]
 requires = ["poetry-core"]

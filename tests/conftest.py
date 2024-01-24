@@ -1,18 +1,13 @@
 import pytest
-from my_project import create_app
+from page_analyzer.app import first_page
 
 @pytest.fixture()
 def app():
-    app = create_app()
+    app = first_page()
     app.config.update({
         "TESTING": True,
     })
-
-    # other setup can go here
-
     yield app
-
-    # clean up / reset resources here
 
 
 @pytest.fixture()

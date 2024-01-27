@@ -4,6 +4,7 @@ from flask import request
 import psycopg2
 import os
 import datetime
+import validators
 from dotenv import load_dotenv
 
 
@@ -18,32 +19,33 @@ app = Flask(__name__)
 def first_page():
     return render_template('index.html')
 
+
 @app.route('/urls/<id>')
 def show_url():
     url = request.args.get('url')
     date = datetime.date()
-    if not validate.url.url('url'):
+    if not validators.url('url'):
         return render_template(
             'notval.html',
             url=url,
-            )
+        )
     with conn.cursor() as curs:
-        curs.execute("INSERT INTO urls (name, created_at) VALUES (%s, %s)", (url, date))
+        curs.execute(
+            "INSERT INTO urls (name, created_at) VALUES (%s, %s)",
+            (url, date))
     return render_template(
         'show_url.html',
-        urls=urls,
-        )
-    if not validate.url(url):
-        return redirect('/urls') 
-    
+        url=url,
+    )
+
+
 @app.route('/urls')
 def show_urls():
     with conn.cursor() as curs:
         curs.execute("SELECT * FROM urls;")
         all_urls = curs.fetchall()
     conn.close()
-    return all_users
-
+    return all_urls
 
 
 if __name__ == '__main__':

@@ -77,7 +77,7 @@ def get_url(id):
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
     cur.execute(
         'SELECT * FROM urls WHERE id = %s',
-        (1,))
+        (id,))
     url = cur.fetchone()
     cur.close()
     conn.close()

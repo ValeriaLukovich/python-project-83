@@ -1,4 +1,4 @@
-required<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
@@ -22,7 +22,11 @@ required<!DOCTYPE html>
 
   </header>
   
-  
+   {% if errors %}
+
+      <div class="alert alert-danger" role="alert">{{ errors.name }}</div>
+
+  {% endif %}
 
   <main class="flex-grow-1">
     <div class="container-lg mt-3">
@@ -33,10 +37,10 @@ required<!DOCTYPE html>
   <div class="col-12 col-md-10 col-lg-8 mx-auto border rounded-3 bg-light p-5">
     <h1 class="display-3">Анализатор страниц</h1>
     <p class="lead">Бесплатно проверяйте сайты на SEO-пригодность</p>
-    <form action="/urls " method="post" class="d-flex justify-content-center" required>
-    <input type="text" required name="url" placeholder="https://www.example.com"value=""  class="form-control form-control-lg">
-    <input type="submit" class="btn btn-primary  btn-lg ms-3 px-5 text-uppercase mx-3" value="Проверить">
-</form>
+    <form action="/urls" method="post" class="d-flex justify-content-center" required enctype="multipart/form-data">
+      <input type="text" name="url" placeholder="https://www.example.com" value="" class="form-control form-control-lg">
+      <input type="submit" class="btn btn-primary  btn-lg ms-3 px-5 text-uppercase mx-3" value="Проверить">
+    </form>
   </div>
 </div>
 

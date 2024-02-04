@@ -22,11 +22,13 @@
 
   </header>
   
-   {% if errors %}
+    {% if messages %}
+     {% for  message in messages %} 
 
-      <div class="alert alert-danger" role="alert">{{ errors.name }}</div>
+      <div class="alert alert-danger" role="alert">{{ message }}</div>
 
-  {% endif %}
+     {% endfor %}
+   {% endif %}
 
   <main class="flex-grow-1">
     <div class="container-lg mt-3">

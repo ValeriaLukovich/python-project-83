@@ -32,7 +32,7 @@ def first_page():
 def get_urls():
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
-    cur.execute('SELECT * FROM urls')
+    cur.execute('SELECT * FROM urls ORDER by id DESC')
     urls = cur.fetchall()
     cur.close()
     conn.close()
@@ -42,6 +42,7 @@ def get_urls():
 @app.post('/urls')
 def post_url():
     url_new = request.form.get('url')
+    print(url_new)
     if not url_new:
         flash('URL обязателен')
         return redirect(url_for('first_page'))
@@ -72,7 +73,7 @@ def post_url():
 
 @app.get('/urls/<id>')
 def get_url(id):
-    messages = get_flashed_messages()
+    messages = get_flashed_messages(with_categories=True)
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
     cur.execute(

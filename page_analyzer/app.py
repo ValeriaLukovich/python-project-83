@@ -89,5 +89,12 @@ def get_url(id):
     return render_template('show_url.html', url=url, messages=messages)
 
 
+@app.post('/urls/<id>/checks')
+def make_check(id):
+    flash('Страница успешно проверена')
+#    last_check = date.today()
+    return redirect(url_for('get_url', id=id))
+
+
 if __name__ == '__main__':
     app.run()

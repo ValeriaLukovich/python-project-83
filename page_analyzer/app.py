@@ -1,5 +1,6 @@
 from flask import (
     Flask,
+    abort,
     render_template,
     request,
     url_for,
@@ -42,43 +43,46 @@ def get_urls():
 @app.post('/urls')
 def post_url():
     url_new = request.form.get('url')
-    print(url_new)
     if not url_new:
         flash('URL обязателен')
         return redirect(url_for('first_page'))
     elif not validators.url(url_new):
         flash('Некорректный URL')
         return redirect(url_for('first_page'))
-    flash('Страница успешно добавлена')
     url_norm = f"{urlparse(url_new).scheme}://{urlparse(url_new).netloc}"
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
     cur.execute('SELECT * FROM urls WHERE name = %s', (url_norm,))
     url = cur.fetchone()
     if url:
+        flash('Страница уже существует')
         id = url.id
     else:
+        flash('Страница успешно добавлена')
         post_date = date.today()
-        cur.execute("""
-            INSERT INTO urls (name, created_at)
-            VALUES (%s, %s) RETURNING id;
-            """,
-                    (url_norm, post_date))
+        cur.execute(
+            'INSERT INTO urls(name, created_at) VALUES(%s, %s) RETURNING id;',
+            (url_norm, post_date))
         _id = cur.fetchone()
         id = _id.id
+    conn.commit()
     cur.close()
     conn.close()
     return redirect(url_for('get_url', id=id))
 
 
-@app.get('/urls/<id>')
+@app.get('/urls/<int:id>')
 def get_url(id):
+    conn = psycopg2.connect(DATABASE_URL)
+    cur = conn.cursor(cursor_factory=NamedTupleCursor)
+    cur.execute('SELECT * FROM urls WHERE id = %s', (id,))
+    url = cur.fetchone()
+    if not url:
+        return abort(404)
     messages = get_flashed_messages(with_categories=True)
     conn = psycopg2.connect(DATABASE_URL)
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
-    cur.execute(
-        'SELECT * FROM urls WHERE id = %s',
-        (id,))
+    cur.execute('SELECT * FROM urls WHERE id = %s', (id,))
     url = cur.fetchone()
     cur.close()
     conn.close()

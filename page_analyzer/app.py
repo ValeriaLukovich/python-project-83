@@ -38,9 +38,17 @@ def get_urls():
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
     cur.execute('SELECT * FROM urls ORDER by id DESC')
     urls = cur.fetchall()
+    for url in urls:
+        cur2 = conn.cursor(cursor_factory=NamedTupleCursor)
+        cur2.execute("""
+            SELECT status_code, created_at
+            FROM url_checks WHERE url_id = %s ORDER by created_at;
+            """,
+                    (url.id,))
+        check = cur2.fetchone()
     cur.close()
     conn.close()
-    return render_template('show_urls.html', urls=urls)
+    return render_template('show_urls.html', urls=urls, check=check)
 
 
 @app.post('/urls')
@@ -93,11 +101,11 @@ def get_url(id):
     )
 
 
-@app.post('/urls/<id>/checks')
-def get_check(id):
+@app.post('/urls/<int:url_id>/checks')
+def get_check(url_id):
     flash('Страница успешно проверена')
     conn = make_connection(DATABASE_URL)
-    url = get_url_by_id(conn, id)
+    url = get_url_by_id(conn, url_id)
     check_dict = make_check(url.name, url.id)
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
     cur.execute("""
@@ -109,7 +117,7 @@ def get_check(id):
                 check_dict)
     conn.commit()
     conn.close()
-    return redirect(url_for('get_url', id=id))
+    return redirect(url_for('get_url', id=url.id))
 
 
 if __name__ == '__main__':

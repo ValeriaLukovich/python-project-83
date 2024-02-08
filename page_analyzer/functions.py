@@ -29,25 +29,27 @@ def get_url_by_name(conn, url):
     return url_new
 
 
-def make_check(url, id):
+def make_check(url, url_id):
     headers = {'user-agent': 'my-app/0.0.1'}
     try:
         response = requests.get(url, headers=headers)
     except requests.exceptions.RequestException:
         flash('Произошла ошибка при проверке')
         return
-    r_status = response.status_code
     src = response.text
     soup = BeautifulSoup(src, 'html.parser')
     s_h1 = soup.h1.string if soup.h1 else ''
     s_title = soup.title.string if soup.title else ''
-    s_description = soup.find("meta", attrs={"name": "description"})['content']
-    last_check = date.today()
+    description = soup.find("meta", attrs={"name": "description"})
+    if description:
+        description = description['content']
+    else:
+        description = ''
     return {
-        "url_id": id,
-        "status_code": r_status,
+        "url_id": url_id,
+        "status_code": response.status_code,
         "h1": s_h1,
         "title": s_title,
-        "description": s_description,
-        "created_at": last_check,
+        "description": description,
+        "created_at": date.today(),
     }

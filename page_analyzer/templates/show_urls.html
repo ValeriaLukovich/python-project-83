@@ -49,10 +49,10 @@
             </a>
           </td>
           
-          <td>{{ last_check }}</td>
+          <td>{{ check.created_at }}</td>
           
           
-          <td>{{ url.status_code }}</td>
+          <td>{{ check.status_code }}</td>
           
         </tr>
       {% endfor %}  

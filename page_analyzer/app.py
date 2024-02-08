@@ -43,8 +43,8 @@ def get_urls():
         cur2.execute("""
             SELECT status_code, created_at
             FROM url_checks WHERE url_id = %s ORDER by created_at;
-            """,
-                    (url.id,))
+            """, (url.id,)
+        )
         check = cur2.fetchone()
     cur.close()
     conn.close()

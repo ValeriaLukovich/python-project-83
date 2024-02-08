@@ -72,12 +72,18 @@
       </tr>
     </thead>
       <tbody>
-        <td>{{ url.id }}</td>
-        <td>{{ status_code }}</td>
-        <td>{{ h1 }}</td>
-        <td>{{ title }}</td>
-        <td>{{ description }}</td>
-        <td>{{ url.created_at }}</td>   
+        {% if checks %}
+          {% for check in checks %}
+          <tr>
+            <td>{{ check['id'] }}</td>
+            <td>{{ check['status_code'] }}</td>
+            <td>{{check['h1'] }}</td>
+            <td>{{ check['title'] }}</td>
+            <td>{{ check['description'] }}</td>
+            <td>{{ check['created_at'] }}</td>
+           </tr>
+           {% endfor %}  
+         {% endif %}   
       </tbody>
     </table>
   </div>

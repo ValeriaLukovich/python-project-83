@@ -34,8 +34,9 @@ def make_check(url, url_id):
     try:
         response = requests.get(url, headers=headers)
     except requests.exceptions.RequestException:
-        flash('Произошла ошибка при проверке')
         return
+    if response.status_code != 200:
+        flash('Произошла ошибка при проверке')
     src = response.text
     soup = BeautifulSoup(src, 'html.parser')
     s_h1 = soup.h1.string if soup.h1 else ''

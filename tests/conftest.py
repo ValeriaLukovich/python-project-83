@@ -1,6 +1,7 @@
 import pytest
 from page_analyzer.app import first_page
 
+
 @pytest.fixture()
 def app():
     app = first_page()

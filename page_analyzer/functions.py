@@ -17,14 +17,14 @@ def make_connection(db):
 
 def get_url_by_id(conn, id):
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
-    cur.execute('SELECT * FROM urls WHERE id = %s', (id,))
+    cur.execute('SELECT * FROM urls WHERE id = %s;', (id,))
     url = cur.fetchone()
     return url
 
 
 def get_url_by_name(conn, url):
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
-    cur.execute('SELECT * FROM urls WHERE name = %s', (url,))
+    cur.execute('SELECT * FROM urls WHERE name = %s;', (url,))
     url_new = cur.fetchone()
     return url_new
 

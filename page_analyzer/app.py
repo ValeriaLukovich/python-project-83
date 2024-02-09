@@ -36,7 +36,7 @@ def first_page():
 def get_urls():
     conn = make_connection(DATABASE_URL)
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
-    cur.execute('SELECT * FROM urls ORDER by id DESC')
+    cur.execute('SELECT * FROM urls ORDER by id DESC;')
     urls = cur.fetchall()
     for url in urls:
         cur2 = conn.cursor(cursor_factory=NamedTupleCursor)
@@ -89,7 +89,7 @@ def get_url(id):
     messages = get_flashed_messages(with_categories=True)
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
     cur.execute(
-        'SELECT * FROM url_checks WHERE url_id = %s ORDER by id DESC', (id,)
+        'SELECT * FROM url_checks WHERE url_id = %s ORDER by id DESC;', (id,)
     )
     checks = cur.fetchall()
     conn.close()

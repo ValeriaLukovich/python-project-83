@@ -16,13 +16,13 @@ python-dotenv = "^1.0.1"
 validators = "^0.22.0"
 requests = "^2.31.0"
 beautifulsoup4 = "^4.12.3"
+flask = "^3.0.2"
 
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^7.0.0"
 pytest = "7.4.4"
 gunicorn = "21.2.0"
-flask = "3.0.1"
 
 [build-system]
 requires = ["poetry-core"]

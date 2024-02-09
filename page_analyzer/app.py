@@ -34,6 +34,7 @@ def first_page():
 
 @app.get('/urls')
 def get_urls():
+    messages = get_flashed_messages()
     conn = make_connection(DATABASE_URL)
     cur = conn.cursor(cursor_factory=NamedTupleCursor)
     cur.execute('SELECT * FROM urls ORDER by id DESC;')
@@ -48,7 +49,12 @@ def get_urls():
         check = cur2.fetchone()
     cur.close()
     conn.close()
-    return render_template('show_urls.html', urls=urls, check=check)
+    return render_template(
+        'show_urls.html',
+        messages=messages,
+        urls=urls,
+        check=check
+    )
 
 
 @app.post('/urls')
@@ -56,10 +62,10 @@ def post_url():
     url_new = request.form.get('url')
     if not url_new:
         flash('URL обязателен')
-        return redirect(url_for('first_page'))
+        return render_template('index.html')
     elif not validators.url(url_new):
         flash('Некорректный URL')
-        return redirect(url_for('first_page'))
+        return render_template('index.html'), 422
     url_norm = f"{urlparse(url_new).scheme}://{urlparse(url_new).netloc}"
     conn = make_connection(DATABASE_URL)
     url = get_url_by_name(conn, url_norm)

@@ -1,6 +1,5 @@
 dist/
 .DS_Store
 .venv/
- .env/ 
+.env/ 
 __pycache__
-screens/

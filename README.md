@@ -10,10 +10,6 @@ Page Analyzer is a site that analyzes specified pages for SEO suitability.
 
 ![Alt text](<Screenshot 2024-02-13 at 17.21.27.png>)
 
-![Alt text](<Screenshot 2024-02-13 at 17.23.07.png>)
-
-![Alt text](<Screenshot 2024-02-13 at 17.23.42.png>)
-
 This project was built using these tools:
 
 Python 3.8.18

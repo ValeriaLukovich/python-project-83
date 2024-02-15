@@ -80,9 +80,12 @@ def get_url(id):
 
 @app.post('/urls/<int:url_id>/checks')
 def get_check(url_id):
-    flash('Страница успешно проверена')
     url = get_url_by_id(DATABASE_URL, url_id)
     check_dict = make_check(url.name, url.id)
+    if check_dict['status_code'] != 200:
+        flash('Произошла ошибка при проверке')
+    else:
+        flash('Страница успешно проверена')
     add_check(DATABASE_URL, check_dict)
     return redirect(url_for('get_url', id=url.id))
 

@@ -3,7 +3,6 @@ from psycopg2.extras import NamedTupleCursor, RealDictCursor
 from datetime import date
 from bs4 import BeautifulSoup
 import requests
-from flask import flash
 
 
 def make_connection(db):
@@ -41,6 +40,21 @@ def show_url(db, id):
     return checks
 
 
+def add_url(db, url):
+    post_date = date.today()
+    conn = make_connection(db)
+    cur = conn.cursor(cursor_factory=NamedTupleCursor)
+    cur.execute(
+        'INSERT INTO urls(name, created_at) VALUES(%s, %s) RETURNING id;',
+        (url, post_date)
+    )
+    _id = cur.fetchone()
+    id = _id.id
+    conn.commit()
+    conn.close()
+    return id
+
+
 def show_urls_check(db):
     conn = make_connection(db)
     cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -59,21 +73,6 @@ def show_urls_check(db):
     cur.close()
     conn.close()
     return urls
-
-
-def add_url(db, url):
-    post_date = date.today()
-    conn = make_connection(db)
-    cur = conn.cursor(cursor_factory=NamedTupleCursor)
-    cur.execute(
-        'INSERT INTO urls(name, created_at) VALUES(%s, %s) RETURNING id;',
-        (url, post_date)
-    )
-    _id = cur.fetchone()
-    id = _id.id
-    conn.commit()
-    conn.close()
-    return id
 
 
 def html_parser(src):
@@ -98,8 +97,6 @@ def make_check(url, url_id):
         response = requests.get(url, headers=headers)
     except requests.exceptions.RequestException:
         return
-    if response.status_code != 200:
-        flash('Произошла ошибка при проверке')
     src = response.text
     parsing_results = html_parser(src)
     parsing_results["url_id"] = url_id

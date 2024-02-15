@@ -84,8 +84,7 @@ def get_check(url_id):
     check_dict = make_check(url.name, url.id)
     if check_dict['status_code'] != 200:
         flash('Произошла ошибка при проверке')
-    else:
-        flash('Страница успешно проверена')
+    flash('Страница успешно проверена')
     add_check(DATABASE_URL, check_dict)
     return redirect(url_for('get_url', id=url.id))
 

@@ -22,8 +22,10 @@ To assemble package use command: make build
 
 To publish package use command: make publish
 
-And install package with command: make package install
-
 To run pytest use command: make test
 
 To run linter use command: make lint
+
+To run app use command: make dev
+
+To use the app properly you'll need to provide it with $DATABASE_URL and $SECRET_KEY vars.

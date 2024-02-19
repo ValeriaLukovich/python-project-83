@@ -1,113 +1,78 @@
 import psycopg2
 from psycopg2.extras import NamedTupleCursor, RealDictCursor
 from datetime import date
-from bs4 import BeautifulSoup
-import requests
+import os
+from dotenv import load_dotenv
 
 
-def make_connection(db):
-    conn = psycopg2.connect(db)
-    return conn
+load_dotenv()
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 
-def get_url_by_id(db, id):
-    conn = make_connection(db)
-    cur = conn.cursor(cursor_factory=NamedTupleCursor)
+def cursor_init(cursor_t=NamedTupleCursor):
+    def cursor_type(func):
+        def wrapper(*args, **kwargs):
+            conn = psycopg2.connect(DATABASE_URL)
+            with conn:
+                with conn.cursor(cursor_factory=cursor_t) as cur:
+                    res = func(cur, *args, **kwargs)
+            conn.commit()
+            conn.close()
+            return res
+        return wrapper
+    return cursor_type
+
+
+@cursor_init(cursor_t=NamedTupleCursor)
+def get_url_by_id(cur, id):
     cur.execute('SELECT * FROM urls WHERE id = %s;', (id,))
     url = cur.fetchone()
     return url
 
 
-def get_url_by_name(db, url):
-    conn = make_connection(db)
-    cur = conn.cursor(cursor_factory=NamedTupleCursor)
+@cursor_init(cursor_t=NamedTupleCursor)
+def get_url_by_name(cur, url):
     cur.execute('SELECT * FROM urls WHERE name = %s;', (url,))
     url_new = cur.fetchone()
-    cur.close()
-    conn.close()
     return url_new
 
 
-def show_url(db, id):
-    conn = make_connection(db)
-    cur = conn.cursor(cursor_factory=NamedTupleCursor)
+@cursor_init(cursor_t=NamedTupleCursor)
+def show_url(cur, id):
     cur.execute(
         'SELECT * FROM url_checks WHERE url_id = %s ORDER by id DESC;', (id,)
     )
     checks = cur.fetchall()
-    cur.close()
-    conn.close()
     return checks
 
 
-def add_url(db, url):
+@cursor_init(cursor_t=NamedTupleCursor)
+def add_url(cur, url):
     post_date = date.today()
-    conn = make_connection(db)
-    cur = conn.cursor(cursor_factory=NamedTupleCursor)
     cur.execute(
         'INSERT INTO urls(name, created_at) VALUES(%s, %s) RETURNING id;',
         (url, post_date)
     )
     _id = cur.fetchone()
     id = _id.id
-    conn.commit()
-    conn.close()
     return id
 
 
-def show_urls_check(db):
-    conn = make_connection(db)
-    cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute('SELECT id, name FROM urls ORDER by id DESC;')
+@cursor_init(cursor_t=RealDictCursor)
+def show_urls_check(cur):
+    cur.execute("""
+        SELECT DISTINCT urls.id, name , url_checks.created_at,
+        url_checks.status_code
+        FROM urls
+        LEFT JOIN url_checks ON urls.id = url_checks.url_id
+        ORDER BY urls.id DESC;
+    """)
     urls = cur.fetchall()
-    for url in urls:
-        cur.execute("""
-            SELECT url_id, status_code, created_at
-            FROM url_checks WHERE url_id = %s ORDER BY created_at;
-        """, (url['id'], )
-        )
-        check = cur.fetchone()
-        if check:
-            url['created_at'] = check['created_at']
-            url['status_code'] = check['status_code']
-    cur.close()
-    conn.close()
     return urls
 
 
-def html_parser(src):
-    soup = BeautifulSoup(src, 'html.parser')
-    s_h1 = soup.h1.string if soup.h1 else ''
-    s_title = soup.title.string if soup.title else ''
-    description = soup.find("meta", attrs={"name": "description"})
-    if description:
-        description = description['content']
-    else:
-        description = ''
-    return {
-        "h1": s_h1,
-        "title": s_title,
-        "description": description,
-    }
-
-
-def make_check(url, url_id):
-    headers = {'user-agent': 'my-app/0.0.1'}
-    try:
-        response = requests.get(url, headers=headers)
-    except requests.exceptions.RequestException:
-        return
-    src = response.text
-    parsing_results = html_parser(src)
-    parsing_results["url_id"] = url_id
-    parsing_results["status_code"] = response.status_code,
-    parsing_results["created_at"] = date.today()
-    return parsing_results
-
-
-def add_check(db, check_dict):
-    conn = make_connection(db)
-    cur = conn.cursor(cursor_factory=NamedTupleCursor)
+@cursor_init(cursor_t=NamedTupleCursor)
+def add_check(cur, check_dict):
     cur.execute("""
         INSERT INTO url_checks (url_id, status_code,
         h1, title, description, created_at)
@@ -115,5 +80,3 @@ def add_check(db, check_dict):
         %(title)s, %(description)s, %(created_at)s);
         """,
                 check_dict)
-    conn.commit()
-    conn.close()
